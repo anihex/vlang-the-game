@@ -18,16 +18,19 @@ mut:
     y_pos u16
     texture_id byte
     tile_type byte
+    replacement byte
 }
 
 const (
     TILE_TYPE_BACKGROUND = 0
     TILE_TYPE_SOLID = 1
+    TILE_TYPE_BONUS = 2
+    TILE_TYPE_BOX = 3
 )
 
 [inline]
 fn (tile &Tile) solid() bool {
-    return tile.id != 0 && tile.tile_type == TILE_TYPE_SOLID
+    return tile.id != 0 && (tile.tile_type == TILE_TYPE_SOLID || tile.tile_type == TILE_TYPE_BOX)
 }
 
 fn (game mut Game) tile_map_init() {
@@ -88,7 +91,7 @@ fn (tile_map mut TileMap) load_texture(list []SExpression) {
 }
 
 fn (tile_map mut TileMap) read_tile(list []SExpression) {
-    if list.len != 6 {
+    if list.len < 6 {
         return
     }
 
@@ -106,7 +109,6 @@ fn (tile_map mut TileMap) read_tile(list []SExpression) {
     tile.tile_type = byte(list[5].get_int())
 
     tile_map.tiles.put(int(tile.id), tile)
-    C.printf("t addr: 0x%016x\n", tile)
     println('tile $tile.id (tex: $tile.texture_id, x: $tile.x_pos, y: $tile.y_pos, type: $tile.tile_type)')
 }
 
@@ -116,9 +118,6 @@ fn (tile_map &TileMap) draw_tile(id byte, x, y int) {
     }
 
     tile := &Tile(tile_map.tiles.get(int(id))) // assert ret != 0?
-    //C.printf("t2 addr: 0x%016x\n", tile)
-    
-    //println('draw $tile.id (tex: $tile.texture_id, x: $tile.x_pos, y: $tile.y_pos, type: $tile.tile_type)')
     
     if !tile_map.textures.has(int(tile.texture_id)) {
         return

@@ -310,6 +310,50 @@ fn (level &Level) is_solid(x, y int) bool {
     return false
 }
 
+/*fn (level &Level) is_solid_d(x, y int) bool {
+    result := level.is_solid(x, y)
+
+    if result {
+        level.game.fillrect(x * 32 - level.game.scroll_x, y * 32 - level.game.scroll_y, 32, 32, 255, 0, 255, 50)
+    } else {
+        level.game.fillrect(x * 32 - level.game.scroll_x, y * 32 - level.game.scroll_y, 32, 32, 255, 255, 0, 50)
+    }
+
+    return result
+}*/
+
+fn (level &Level) tile_ic(x, y int) byte {
+    if x > level.width || y > level.height || x < 0 || y < 0 {
+        return 0
+    }
+
+    return C.vp_get(level.layer_ic, (y * level.width) + x)
+}
+
+fn (level &Level) idx_ic(index int) byte {
+    if index < 0 || index > level.width * level.height {
+        return 0
+    }
+
+    return C.vp_get(level.layer_ic, index)
+}
+
+fn (level &Level) idx_bg(index int) byte {
+    if index < 0 || index > level.width * level.height {
+        return 0
+    }
+
+    return C.vp_get(level.layer_bg, index)
+}
+
+fn (level &Level) idx_fg(index int) byte {
+    if index < 0 || index > level.width * level.height {
+        return 0
+    }
+
+    return C.vp_get(level.layer_fg, index)
+}
+
 fn (subset mut LevelSubset) free() {
     if subset.has_image {
         subset.subset_image.free()

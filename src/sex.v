@@ -160,7 +160,9 @@ fn (parser mut SExpressionParser) read_number_or_symbol(exp mut SExpression) boo
     mut bytes := []byte
     
     for {
-        if is_number {
+        if c == SC_SEMICOLON {
+            parser.skip_comment()
+        } else if is_number {
             if c == SC_MINUS {
                 sign = true
             } else if c.is_digit() {
@@ -209,6 +211,8 @@ fn (parser mut SExpressionParser) read_list(exp mut SExpression) bool {
         if c == EOF {
             exp.make_err('unexpected EOF')
             return false
+        } else if c == SC_SEMICOLON {
+            parser.skip_comment()
         } else if c == SC_RIGHT_PAREN {
             exp._type = S_TYPE_LIST
             return true
