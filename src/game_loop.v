@@ -10,6 +10,8 @@ const (
     SPRINT_SPEED = 2.8
     WALK_ACCEL = 0.03
     SPRINT_ACCEL = 0.04
+    WALK_JUMP_VEL = -5.2
+    SPRINT_JUMP_VEL = -5.8
 )
 
 struct InputState {
@@ -19,7 +21,7 @@ mut:
     left bool
     right bool
     jump bool
-    sprint bool
+    walk bool
     old_jump bool
     can_jump bool
     jumping bool
@@ -50,8 +52,8 @@ fn (game mut Game) handle_game_sdl_event(key int, state bool) bool {
             game.input_state.jump = state
             return true
         }
-        game.keymap.player_sprint => {
-            game.input_state.sprint = state
+        game.keymap.player_walk => {
+            game.input_state.walk = state
             return true
         }
     }
@@ -67,12 +69,12 @@ fn (game mut Game) process_input() {
     game.player_xo = game.player_x
     game.player_yo = game.player_y
 
-    mut accel := WALK_ACCEL
-    mut speed := WALK_SPEED
+    mut accel := SPRINT_ACCEL
+    mut speed := SPRINT_SPEED
 
-    if game.input_state.sprint {
-        accel = SPRINT_ACCEL
-        speed = SPRINT_SPEED
+    if game.input_state.walk {
+        accel = WALK_ACCEL
+        speed = WALK_SPEED
     }
 
     mut dir_s := f64(0)
@@ -87,7 +89,11 @@ fn (game mut Game) process_input() {
         dir_s = f64(DIR_LEFT)
     }
 
-    ax = dir_s * WALK_ACCEL
+    if !game.input_state.walk {
+        ax = dir_s * SPRINT_ACCEL
+    } else {
+        ax = dir_s * WALK_ACCEL
+    }
     //println('$dir_s $ax')
 
     if (vx >= speed) && (dir_s == DIR_RIGHT) { // clamp speed
@@ -137,9 +143,9 @@ fn (game mut Game) process_input() {
                 game.sounds.jump.play()
 
                 if C.fabs(game.physics.vel_x) > WALK_SPEED {
-                    game.physics.vel_y = -5.8
+                    game.physics.vel_y = SPRINT_JUMP_VEL
                 } else {
-                    game.physics.vel_y = -5.2
+                    game.physics.vel_y = WALK_JUMP_VEL
                 }
 
                 game.player_y--
@@ -357,16 +363,16 @@ fn (game &Game) collision_map(pos_x, pos_y, w, h f64) bool {
 
     for x := start_x; x * 32 < max_x; x++ {
         for y := start_y; y * 32 < max_y; y++ {
-            tid := C.vp_get(level.layer_ic, (y * level.width) + x)
+            tid := int(level.tile_ic(x, y))
             if tid != 0 {
-                tile := &Tile(game.tile_map.tiles.get(int(tid)))
+                tile := &Tile(game.tile_map.tiles.get(tid))
                 if tile != NULL && tile.solid() {
-                    game.fillrect(x * 32 - game.scroll_x, y * 32 - game.scroll_y, 32, 32, 255, 0, 0, 50)
+                    //game.fillrect(x * 32 - game.scroll_x, y * 32 - game.scroll_y, 32, 32, 255, 0, 0, 50)
                     return true
                 }
             }
             
-            game.fillrect(x * 32 - game.scroll_x, y * 32 - game.scroll_y, 32, 32, 0, 255, 0, 50)
+            //game.fillrect(x * 32 - game.scroll_x, y * 32 - game.scroll_y, 32, 32, 0, 255, 0, 50)
         }
     }
 
@@ -388,8 +394,8 @@ fn (game &Game) player_on_ground() bool {
     }
 
     return game.current_level.is_solid(int(f32(game.player_x + game.player_w / 2) / 32.0), int(f32(game.player_y + game.player_h) / 32.0))
-        && game.current_level.is_solid(int(f32(game.player_x + 1) / 32.0), int(f32(game.player_y + game.player_h) / 32.0))
-        && game.current_level.is_solid(int(f32(game.player_x + game.player_w - 1) / 32.0), int(f32(game.player_y + game.player_h) / 32.0))
+        || game.current_level.is_solid(int(f32(game.player_x + 1) / 32.0), int(f32(game.player_y + game.player_h) / 32.0))
+        || game.current_level.is_solid(int(f32(game.player_x + game.player_w - 1) / 32.0), int(f32(game.player_y + game.player_h) / 32.0))
 }
 
 fn (game &Game) player_under_solid() bool {
@@ -398,8 +404,8 @@ fn (game &Game) player_under_solid() bool {
     }
 
     return game.current_level.is_solid(int(f32(game.player_x + game.player_w / 2) / 32.0), int(f32(game.player_y) / 32.0))
-        && game.current_level.is_solid(int(f32(game.player_x + 1) / 32.0), int(f32(game.player_y) / 32.0))
-        && game.current_level.is_solid(int(f32(game.player_x + game.player_w - 1) / 32.0), int(f32(game.player_y) / 32.0))
+        || game.current_level.is_solid(int(f32(game.player_x + 1) / 32.0), int(f32(game.player_y) / 32.0))
+        || game.current_level.is_solid(int(f32(game.player_x + game.player_w - 1) / 32.0), int(f32(game.player_y) / 32.0))
 }
 
 fn (game mut Game) game_loop() bool {
@@ -534,10 +540,10 @@ fn (game mut Game) game_loop() bool {
 
                 idx = ((start_y + y) * level.width) + start_x + x
 
-                tile = C.vp_get(level.layer_bg, idx)
+                tile = level.idx_bg(idx)
                 game.tile_map.draw_tile(tile, 32 * x - rem_x, 32 * y - rem_y)
 
-                tile = C.vp_get(level.layer_ic, idx)
+                tile = level.idx_ic(idx)
                 game.tile_map.draw_tile(tile, 32 * x - rem_x, 32 * y - rem_y)
             }
         }
@@ -560,13 +566,13 @@ fn (game mut Game) game_loop() bool {
                 idx = ((start_y + y) * level.width) + start_x + x
 
                 // TODO: handle secret regions?
-                tile = C.vp_get(level.layer_fg, idx)
+                tile = level.idx_fg(idx)
                 game.tile_map.draw_tile(tile, 32 * x - rem_x, 32 * y - rem_y)
             }
         }
 
         if delay > 0 {
-            game.fillrect(0, 0, game.sdl.screen_width, game.sdl.screen_height, 0, 0, 0, byte(delay * f64(255)))
+            game.fillrect(0, 0, game.sdl.screen_width, game.sdl.screen_height, 0, 0, 0, byte(delay * delay * f64(255)))
             delay -= game._delta
         } else {
             delay = 0
