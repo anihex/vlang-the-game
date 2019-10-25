@@ -136,7 +136,7 @@ fn (game mut Game) setup() {
 
 	C.Mix_Init(0)
 	//C.atexit(C.Mix_Quit)
-	if C.Mix_OpenAudio(44100, C.AUDIO_S16, 2, 2048) < 0 {
+	if C.Mix_OpenAudio(48000, C.AUDIO_S16, 2, 2048) < 0 {
 		println('couldn\'t open audio')
 	}
 
