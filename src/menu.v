@@ -60,7 +60,7 @@ fn (game mut Game) menu_set_current(menu &Menu) {
 }
 
 fn (game mut Game) menu_process_current() {
-    if game.current_menu != 0 {
+    if game.current_menu != NULL {
         game.current_menu.action()
         game.current_menu.draw()
     }

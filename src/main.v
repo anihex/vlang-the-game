@@ -54,6 +54,7 @@ mut:
 
     quit bool
     show_menu bool
+    paused bool
 
     datadir string
     current_menu &Menu
@@ -69,6 +70,7 @@ mut:
 
     // states for gui screens
     title_state TitleState
+    pause_menu &Menu
 
     level_subsets []LevelSubset
 
@@ -149,6 +151,11 @@ fn (game mut Game) setup() {
     game.menu_action = MENU_ACTION_NONE
 
     game.keymap_setup()
+
+    game.pause_menu = game.new_menu()
+    game.pause_menu.add_action('Continue')
+    game.pause_menu.add_action('Restart level')
+    game.pause_menu.add_action('Quit')
 }
 
 fn (game mut Game) free() {

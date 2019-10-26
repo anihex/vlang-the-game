@@ -438,6 +438,9 @@ fn (game mut Game) game_loop() bool {
         game.flipscreen()
     }
 
+    game.paused = false
+    game.scroll_x = 0
+    game.scroll_y = 0
     game.input_state.reset()
     game.physics.reset()
     game.set_current_music(MusicType.LEVEL_MUSIC)
@@ -487,10 +490,6 @@ fn (game mut Game) game_loop() bool {
         max_tiles_y = level.height
     }
 
-    if 3 == 4 { // just to make V shut up for now
-        done = true
-    }
-
     init_x := 70
     init_y := 100
     game.player_x = init_x
@@ -511,9 +510,16 @@ fn (game mut Game) game_loop() bool {
             } else if C.st_event_type() == C.SDL_KEYDOWN {
                 key := C.st_event_sym()
                 game.handle_game_sdl_event(key, true)
+                
+                if key == C.SDLK_ESCAPE {
+                    game.paused = !game.paused
+                }
+
+                game.menu_sdl_event()
             } else if C.st_event_type() == C.SDL_KEYUP {
                 key := C.st_event_sym()
                 game.handle_game_sdl_event(key, false)
+                game.menu_sdl_event()
             }
         }
         game.clearscreen(0, 0, 0)
@@ -581,12 +587,37 @@ fn (game mut Game) game_loop() bool {
                 game.sounds.scream.play()
                 game.player_x = init_x
                 game.player_y = init_y
+                game.scroll_x = 0
+                game.scroll_y = 0
                 delay = 1
             }
 
-            // process input
-            game.process_input()
-            game.process_physics(game._delta * 100)
+            if game.paused {
+                game.input_state.left = false
+                game.input_state.right = false
+                game.input_state.jump = false
+                game.input_state.walk = false
+
+                game.current_menu = game.pause_menu
+                game.show_menu = true
+                game.menu_process_current()
+
+                match game.pause_menu.check() {
+                    0 => {
+                        game.paused = false
+                    }
+                    2 => {
+                        done = true
+                    }
+                }
+            } else {
+                game.current_menu = NULL
+                game.show_menu = false
+
+                // process input
+                game.process_input()
+                game.process_physics(game._delta * 100)        
+            }
         }
 
         C.SDL_Delay(1)
