@@ -1,17 +1,20 @@
 // Copyright(C) 2019 Nicolas Sauzede. All rights reserved.
 // Use of this source code is governed by an MIT license
-// that can be found in the LICENSE file.
+// that can be found in the LICENSE_sdlv file.
 
 module main
 
 // apparently, following line also works on non-linux ? o_O
 #flag linux `sdl2-config --cflags --libs`  -lSDL2_image -lSDL2_mixer
 #flag darwin `sdl2-config --cflags --libs`  -lSDL2_image -lSDL2_mixer
-#flag windows -Isdl-win\include 
+#flag windows -Isdl-win\include
 #flag windows sdl-win\lib\x64\SDL2.lib
 #flag windows sdl-win\lib\x64\SDL2_image.lib
 #flag windows sdl-win\lib\x64\SDL2_mixer.lib
 #flag windows /SUBSYSTEM:CONSOLE
+
+#flag -DSDL_DISABLE_IMMINTRIN_H
+
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_mixer.h>
