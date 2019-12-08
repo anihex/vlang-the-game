@@ -80,7 +80,7 @@ fn (tile_map mut TileMap) load_texture(list []SExpression) {
     id := list[1].get_int()
     path := 'images/tiles/' + list[2].get_string()
 
-    if !os.file_exists(tile_map._game.datadir + path) {
+    if !os.exists(tile_map._game.datadir + path) {
         println('Error loading texture $id -> $path: file not found')
         return
     }

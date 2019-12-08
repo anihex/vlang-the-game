@@ -35,7 +35,7 @@ fn (subset &LevelSubset) load_level(file string) ?Level {
 
     path := subset.directory + '/' + file
     
-    if !os.file_exists(path) {
+    if !os.exists(path) {
         return error('Cannot find level file!')
     }
 
@@ -69,45 +69,46 @@ fn (subset &LevelSubset) load_level(file string) ?Level {
             sym := el[0].get_symbol()
 
             match sym {
-                'name' => {
+                'name' {
                     if !el[1].is(S_TYPE_STRING) {
                         return error('"name" key should be a string!')
                     }
                     level.name = el[1].get_string()
                 }
-                'music' => {
+                'music' {
                     if !el[1].is(S_TYPE_STRING) {
                         return error('"music" key should be a string!')
                     }
                     music = el[1].get_string()
                 }
-                'background' => {
+                'background' {
                     if !el[1].is(S_TYPE_STRING) {
                         return error('"background" key should be a string!')
                     }
                     background = el[1].get_string()
                 }
-                'width' => {
+                'width' {
                     if !el[1].is(S_TYPE_INTEGER) {
                         return error('"width" key should be an integer!')
                     }
                     level.width = el[1].get_int()
                 }
-                'height' => {
+                'height' {
                     if !el[1].is(S_TYPE_INTEGER) {
                         return error('"height" key should be an integer!')
                     }
                     level.height = el[1].get_int()
                 }
-                'interactive-tm' => {
+                'interactive-tm' {
                     interactive_tiles = el
                 }
-                'foreground-tm' => {
+                'foreground-tm' {
                     foreground_tiles = el
                 }
-                'background-tm' => {
+                'background-tm' {
                     background_tiles = el
                 }
+                else {}
             }
         }
     }
@@ -193,7 +194,7 @@ fn (subset &LevelSubset) load_level(file string) ?Level {
     }
 
     if music != '' {
-        if os.file_exists(subset.game.datadir + 'music/' + music) {
+        if os.exists(subset.game.datadir + 'music/' + music) {
             music_ptr := subset.game.load_music(music)
             if music_ptr != NULL {
                 level.music = music_ptr
@@ -206,7 +207,7 @@ fn (subset &LevelSubset) load_level(file string) ?Level {
     }
 
     if background != '' {
-        if os.file_exists(subset.game.datadir + 'images/background/' + background) {
+        if os.exists(subset.game.datadir + 'images/background/' + background) {
             bg_tex := subset.game.load_texture('images/background/' + background)
             level.background = bg_tex
         } else {
@@ -235,7 +236,7 @@ fn (game mut Game) load_subsets() {
     }
 }
 
-fn (game mut Game) load_subset(name string) ?LevelSubset {
+fn (game &Game) load_subset(name string) ?LevelSubset {
     mut subset := LevelSubset{}
     subset.game = game
     
@@ -245,12 +246,12 @@ fn (game mut Game) load_subset(name string) ?LevelSubset {
     
     subset.directory = path
 
-    if os.file_exists(path) && os.file_exists(info_path) {
+    if os.exists(path) && os.exists(info_path) {
         data := os.read_file(info_path) or {
             return error('error reading info file')
         }
 
-        if os.file_exists(img_path) {
+        if os.exists(img_path) {
             subset.subset_image = game.load_texture('levels/' + name + '/info.png')
             subset.has_image = true
         }
@@ -270,16 +271,17 @@ fn (game mut Game) load_subset(name string) ?LevelSubset {
                     //println('s: $sym')
 
                     match sym {
-                        'title' => {
+                        'title' {
                             if val._list[1].is(S_TYPE_STRING) {
                                 subset.name = val._list[1].get_string()
                             }
                         }
-                        'description' => {
+                        'description' {
                             if val._list[1].is(S_TYPE_STRING) {
                                 subset.description = val._list[1].get_string()
                             }
                         }
+                        else {}
                     }
                 }
             } else {
@@ -354,7 +356,7 @@ fn (level &Level) idx_fg(index int) byte {
     return C.vp_get(level.layer_fg, index)
 }
 
-fn (subset mut LevelSubset) free() {
+fn (subset &LevelSubset) free() {
     if subset.has_image {
         subset.subset_image.free()
     }

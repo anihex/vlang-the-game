@@ -9,7 +9,7 @@ mut:
     char_height int
 }
 
-fn (_game mut Game) load_font(name string, width int, height int) &Font {
+fn (_game &Game) load_font(name string, width int, height int) &Font {
     mut font := &Font{}
     font.game = _game
     font.char_width = width
@@ -29,7 +29,7 @@ const (
     ALIGN_BOTTOM = 8
 )
 
-fn (font mut Font) draw_align(text string, _x int, _y int, align int, alpha byte) {
+fn (font &Font) draw_align(text string, _x int, _y int, align int, alpha byte) {
     mut x := _x
     mut y := _y
 
@@ -48,7 +48,7 @@ fn (font mut Font) draw_align(text string, _x int, _y int, align int, alpha byte
     font.draw(text, x, y, alpha)
 }
 
-fn (font mut Font) draw(text string, _x int, _y int, alpha byte) {
+fn (font &Font) draw(text string, _x int, _y int, alpha byte) {
     mut x := _x 
     mut y := _y
     

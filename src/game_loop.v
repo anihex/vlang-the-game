@@ -1,6 +1,7 @@
 module main
 
 import math
+import sdl
 
 const (
     DIR_LEFT = -1
@@ -40,25 +41,26 @@ fn (state mut InputState) reset() {
 
 fn (game mut Game) handle_game_sdl_event(key int, state bool) bool {
     match u32(key) {
-        game.keymap.player_left => {
+        game.keymap.player_left {
             game.input_state.left = state
             return true
         }
-        game.keymap.player_right => {
+        game.keymap.player_right {
             game.input_state.right = state
             return true
         }
-        game.keymap.player_jump => {
+        game.keymap.player_jump {
             game.input_state.jump = state
             return true
         }
-        game.keymap.player_walk => {
+        game.keymap.player_walk {
             game.input_state.walk = state
             return true
         }
+        else {
+            return false
+        }
     }
-
-    return false
 }
 
 fn (game mut Game) process_input() {
@@ -291,19 +293,19 @@ fn (game mut Game) collision_post() {
         
         if game.collision_map(game.player_xo, game.player_yo, game.player_w, game.player_h) {
             match h {
-                1 => {
+                1 {
                     game.player_y = game.player_yo - yd
                     for game.collision_map(game.player_x, game.player_y, game.player_w, game.player_h) {
                         game.player_y -= yd
                     }
                 }
-                2 => {
+                2 {
                     game.player_x = game.player_xo - xd
                     for game.collision_map(game.player_x, game.player_y, game.player_w, game.player_h) {
                         game.player_x -= xd
                     }
                 }
-                3 => {
+                3 {
                     xt := game.player_x
                     yt := game.player_y
                     game.player_x = game.player_xo - xd
@@ -332,6 +334,9 @@ fn (game mut Game) collision_post() {
                         game.player_y -= yd
                     }
                     break
+                }
+                else {
+                
                 }
             }
             break
@@ -443,7 +448,7 @@ fn (game mut Game) game_loop() bool {
     game.scroll_y = 0
     game.input_state.reset()
     game.physics.reset()
-    game.set_current_music(MusicType.LEVEL_MUSIC)
+    game.set_current_music(.level_music)
     game.play_current_music()
 
     mut delay := f64(0)
@@ -503,23 +508,24 @@ fn (game mut Game) game_loop() bool {
             break
         }
 
-        for C.st_poll_event() {
-            if C.st_event_type() == C.SDL_QUIT {
+        ev := sdl.Event{}
+        for 0 < sdl.poll_event(&ev) {
+            if int(ev._type) == C.SDL_QUIT {
                 game.quit = true
                 break
-            } else if C.st_event_type() == C.SDL_KEYDOWN {
-                key := C.st_event_sym()
+            } else if int(ev._type) == C.SDL_KEYDOWN {
+                key := int(ev.key.keysym.sym)
                 game.handle_game_sdl_event(key, true)
                 
                 if key == C.SDLK_ESCAPE {
                     game.paused = !game.paused
                 }
 
-                game.menu_sdl_event()
-            } else if C.st_event_type() == C.SDL_KEYUP {
-                key := C.st_event_sym()
+                game.menu_sdl_event(ev)
+            } else if int(ev._type) == C.SDL_KEYUP {
+                key := int(ev.key.keysym.sym)
                 game.handle_game_sdl_event(key, false)
-                game.menu_sdl_event()
+                game.menu_sdl_event(ev)
             }
         }
         game.clearscreen(0, 0, 0)
@@ -603,11 +609,14 @@ fn (game mut Game) game_loop() bool {
                 game.menu_process_current()
 
                 match game.pause_menu.check() {
-                    0 => {
+                    0 {
                         game.paused = false
                     }
-                    2 => {
+                    2 {
                         done = true
+                    }
+                    else {
+                
                     }
                 }
             } else {

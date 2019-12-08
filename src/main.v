@@ -1,5 +1,8 @@
 module main
 
+#flag -I"@VPATH"
+#include <globals.h>
+
 import os
 
 struct SdlContext {
@@ -105,7 +108,7 @@ fn (game mut Game) load_data() {
     game.tile_map_init()
 }
 
-fn (game mut Game) draw_cursor() {
+fn (game &Game) draw_cursor() {
     x := 0
     y := 0
     C.SDL_GetMouseState(&x, &y)
@@ -121,29 +124,29 @@ fn (game mut Game) setup() {
     w := 854
     h := 480
 
-	C.SDL_Init(C.SDL_INIT_VIDEO | C.SDL_INIT_AUDIO | C.SDL_INIT_JOYSTICK)
+	SDL_Init(C.SDL_INIT_VIDEO | C.SDL_INIT_AUDIO | C.SDL_INIT_JOYSTICK)
 	//C.atexit(C.SDL_Quit)
 
     mut sdl := &game.sdl
-    C.SDL_CreateWindowAndRenderer(w, h, 0, &sdl.window, &sdl.renderer)
-    C.SDL_SetHint(C.SDL_HINT_RENDER_SCALE_QUALITY, 'linear')
-    C.SDL_SetRenderDrawBlendMode(&sdl.renderer, C.SDL_BLENDMODE_BLEND)
-	C.SDL_SetWindowTitle(sdl.window, 'Vlang the game')
-    C.SDL_ShowCursor(C.SDL_DISABLE)
+    SDL_CreateWindowAndRenderer(w, h, 0, &sdl.window, &sdl.renderer)
+    SDL_SetHint(C.SDL_HINT_RENDER_SCALE_QUALITY, 'linear')
+    SDL_SetRenderDrawBlendMode(&sdl.renderer, C.SDL_BLENDMODE_BLEND)
+	SDL_SetWindowTitle(sdl.window, 'Vlang the game')
+    SDL_ShowCursor(C.SDL_DISABLE)
 	sdl.screen_width = w
 	sdl.screen_height = h
     sdl.scale_x = 1.0
     sdl.scale_y = 1.0
-	sdl.screen = C.SDL_CreateTexture(sdl.renderer, C.SDL_PIXELFORMAT_ARGB8888, C.SDL_TEXTUREACCESS_STREAMING, w, h)
+	sdl.screen = SDL_CreateTexture(sdl.renderer, C.SDL_PIXELFORMAT_ARGB8888, C.SDL_TEXTUREACCESS_STREAMING, w, h)
 
-	C.Mix_Init(0)
+	Mix_Init(0)
 	//C.atexit(C.Mix_Quit)
-	if C.Mix_OpenAudio(48000, C.AUDIO_S16, 2, 2048) < 0 {
+	if Mix_OpenAudio(48000, C.AUDIO_S16, 2, 2048) < 0 {
 		println('couldn\'t open audio')
 	}
 
     //game.mus.use_music = true
-    if os.file_exists('data') {
+    if os.exists('data') {
         game.datadir = './data/'
     } else {
         game.datadir = '../data/'

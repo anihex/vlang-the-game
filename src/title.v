@@ -1,5 +1,7 @@
 module main
 
+import sdl
+
 struct TitleState {
 pub:
 mut:
@@ -14,7 +16,7 @@ mut:
     menu &Menu
 }
 
-fn (game mut Game) title_init() {
+fn (game &Game) title_init() {
     mut title := &game.title_state
     title.initialized = true
     
@@ -28,7 +30,7 @@ fn (game mut Game) title_init() {
     title.menu.add_action('Quit')
 }
 
-fn (game mut Game) title_bg() {
+fn (game &Game) title_bg() {
     mut title := &game.title_state
 
     title.angle = (title.angle + int(title.timer - C.get_ticks())) % 3600
@@ -52,19 +54,20 @@ fn (game mut Game) title_load_failed(_error string) bool {
         }
 
 
-        for {
-            if C.st_poll_event() {
-                if C.st_event_type() == C.SDL_QUIT {
+        ev := sdl.Event{}
+        for 0 < sdl.poll_event(&ev) {
+            match u32(ev._type) {
+                u32(C.SDL_QUIT) {
                     game.quit = true
                     break
-                } else if C.st_event_type() == C.SDL_KEYDOWN {
-                    key := C.st_event_sym()
+                }
+                u32(C.SDL_KEYDOWN) {
+                    key := int(ev.key.keysym.sym)
                     if key == C.SDLK_ESCAPE || key == C.SDLK_RETURN {
                         done = true
                     }
                 }
-            } else {
-                break
+                else {}
             }
         }
 
@@ -107,69 +110,84 @@ fn (game mut Game) prepare_game(subset &LevelSubset) bool {
 }
 
 fn (game mut Game) title_level_select() bool {
-    mut title := &game.title_state
+    title := &game.title_state
     mut done := false
     mut current := 0
     mut frame := 0
-    mut alpha := 0
-    mut ef_x := title.menu.width()
-    mut ef_y := title.menu.height()
+    mut alpha := f64(0)
+    mut ef_x := f64(title.menu.width())
+    mut ef_y := f64(title.menu.height())
+
+    game.delta()
 
     for !(done || game.quit) {
-        for C.st_poll_event() {
-            if C.st_event_type() == C.SDL_QUIT {
-                game.quit = true
-                break
-            } else if C.st_event_type() == C.SDL_KEYDOWN {
-                key := C.st_event_sym()
-                match key {
-                    C.SDLK_ESCAPE => {
-                        done = true
-                    }
-                    C.SDLK_LEFT => {
-                        if current > 0 {
-                            current--
+        ev := sdl.Event{}
+        for 0 < sdl.poll_event(&ev) {
+            match u32(ev._type) {
+                u32(C.SDL_QUIT) {
+                    game.quit = true
+                    break
+                }
+                u32(C.SDL_KEYDOWN) {
+                    key := int(ev.key.keysym.sym)
+                    match key {
+                        C.SDLK_ESCAPE {
+                            done = true
                         }
-                    }
-                    C.SDLK_RIGHT => {
-                        if current < game.level_subsets.len {
-                            current++
+                        C.SDLK_LEFT {
+                            if current > 0 {
+                                current--
+                            }
                         }
-                    }
-                    C.SDLK_RETURN => {
-                        if current != game.level_subsets.len {
-                            subset := &LevelSubset(C.array_get(game.level_subsets, current))
-                            return game.prepare_game(subset)
+                        C.SDLK_RIGHT {
+                            if current < game.level_subsets.len {
+                                current++
+                            }
                         }
+                        C.SDLK_RETURN {
+                            if current != game.level_subsets.len {
+                                subset := &LevelSubset(C.array_get(game.level_subsets, current))
+                                return game.prepare_game(subset)
+                            }
+                        }
+                        else {}
                     }
                 }
+                u32(C.SDL_MOUSEBUTTONDOWN) {
+                    game.menu_sdl_event_mouse(&SdlMotionEvent(&ev))
+                }
+                u32(C.SDL_MOUSEMOTION) {
+                    game.menu_sdl_event_mouse(&SdlMotionEvent(&ev))
+                }
+                else {}
             }
         }
 
         game.title_bg()
-        game.fillrect((game.sdl.screen_width - ef_x) / 2, (game.sdl.screen_height - ef_y) / 2, ef_x, ef_y, 0, 0, 0, 100)
-        if alpha == 255 {
+        game.fillrect((game.sdl.screen_width - int(ef_x)) / 2, (game.sdl.screen_height - int(ef_y)) / 2, int(ef_x), int(ef_y), 0, 0, 0, 100)
+        if alpha >= 255 {
             if current == game.level_subsets.len {
-                game.font_red.draw_align('Chapter ? - ???', game.sdl.screen_width / 2, 30, ALIGN_CENTER | ALIGN_TOP, 255)
+                game.font_red.draw_align('Chapter ? - ???', game.sdl.screen_width / 2, game.sdl.screen_height / 2 - 200, ALIGN_CENTER | ALIGN_TOP, 255)
                 game.font_white.draw_align('Coming soon!', game.sdl.screen_width / 2, game.sdl.screen_height / 2, ALIGN_CENTER | ALIGN_MIDDLE, 255)
             } else {
                 subset := &LevelSubset(C.array_get(game.level_subsets, current))
-                game.font_red.draw_align(subset.name, game.sdl.screen_width / 2, 30, ALIGN_CENTER | ALIGN_TOP, 255)
-                game.font_white.draw_align(subset.description, game.sdl.screen_width / 2, game.sdl.screen_height - 30, ALIGN_CENTER | ALIGN_BOTTOM, 255)
+                game.font_red.draw_align(subset.name, game.sdl.screen_width / 2, game.sdl.screen_height / 2 - 200, ALIGN_CENTER | ALIGN_TOP, 255)
+                game.font_white.draw_align(subset.description, game.sdl.screen_width / 2, game.sdl.screen_height / 2 + 100, ALIGN_CENTER | ALIGN_BOTTOM, 255)
                 
                 if subset.has_image {
-                    game.texture_draw(subset.subset_image, (game.sdl.screen_width - subset.subset_image.w) / 2, 100)
+                    game.texture_draw(subset.subset_image, (game.sdl.screen_width - subset.subset_image.w) / 2, (game.sdl.screen_height - subset.subset_image.h) / 2 - 50)
                 } else {
-                    game.texture_draw(title.default_subset, (game.sdl.screen_width - title.default_subset.w) / 2, 100)
+                    game.texture_draw(title.default_subset, (game.sdl.screen_width - title.default_subset.w) / 2, (game.sdl.screen_height - subset.subset_image.h) / 2 - 50)
                 }
             }
         }
 
-        if ef_x < 500 { ef_x++ }
-        if ef_y < game.sdl.screen_height { ef_y++ }
-        if alpha < 255 { alpha++ }
+        delta := game.delta() * 500
 
-        C.SDL_Delay(1)
+        if ef_x < 500 { ef_x += delta }
+        if ef_y < game.sdl.screen_height { ef_y += delta }
+        if alpha < 255 { alpha += delta }
+
         game.draw_cursor()
         game.flipscreen()
         frame++
@@ -188,8 +206,8 @@ fn (game mut Game) title() bool {
     mut title := &game.title_state
     title.timer = C.get_ticks()
     
-    if game.get_current_music() != MusicType.MENU_MUSIC {
-        game.set_current_music(MusicType.MENU_MUSIC)
+    if game.get_current_music() != .menu_music {
+        game.set_current_music(.menu_music)
         game.play_current_music()
     }
 
@@ -199,14 +217,10 @@ fn (game mut Game) title() bool {
     //game.flipscreen()
     game.menu_set_current(title.menu)
 
-    for {
-        if C.st_poll_event() {
-            if C.st_event_type() == C.SDL_QUIT {
-                game.quit = true
-                break
-            }
-        } else {
-            break
+    ev := sdl.Event{}
+    for 0 < sdl.poll_event(&ev) {
+        if u32(ev._type) == u32(C.SDL_QUIT) {
+            game.quit = true
         }
     }
 
@@ -215,16 +229,11 @@ fn (game mut Game) title() bool {
             break
         }
 
-        for {
-            if C.st_poll_event() {
-                if C.st_event_type() == C.SDL_QUIT {
-                    game.quit = true
-                    break
-                } else if title.had_intro {
-                    game.menu_sdl_event()
-                }
-            } else {
-                break
+        for 0 < sdl.poll_event(&ev) {
+            if u32(ev._type) == u32(C.SDL_QUIT) {
+                game.quit = true
+            } else if title.had_intro {
+                game.menu_sdl_event(ev)
             }
         }
 
@@ -236,15 +245,16 @@ fn (game mut Game) title() bool {
 
         if game.current_menu == title.menu {
             match title.menu.check() {
-                0 => {
+                0 {
                     done = game.title_level_select()
                 }
-                1 => {
+                1 {
                     done = true
                 }
-                3 => {
+                3 {
                     game.quit = true
                 }
+                else {}
             }
         }
 

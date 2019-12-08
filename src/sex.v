@@ -261,23 +261,23 @@ fn (parser mut SExpressionParser) read_string(exp mut SExpression) bool {
             c = parser.next_char()
 
             match c {
-                EOF => {
+                EOF {
                     exp.make_err('unexpected EOF')
                     return false
                 }
-                `n` => {
+                `n` {
                     bytes << SC_NEWLINE
                 }
-                `r` => {
+                `r` {
                     bytes << SC_CARRIAGE
                 }
-                `t` => {
+                `t` {
                     bytes << SC_TAB
                 }
-                SC_QUOTE => {
+                SC_QUOTE {
                     bytes << SC_QUOTE
                 }
-                else => {
+                else {
                     exp.make_err('invalid escape')
                     return false
                 }
@@ -303,19 +303,20 @@ fn (parser mut SExpressionParser) parse(exp mut SExpression) bool {
     for {
         parsed = false
         match c {
-            SC_SEMICOLON => {
+            SC_SEMICOLON {
                 parsed = true
                 parser.skip_comment()
             }
-            SC_QUOTE => {
+            SC_QUOTE {
                 return parser.read_string(mut exp)
             }
-            SC_LEFT_PAREN => {
+            SC_LEFT_PAREN {
                 return parser.read_list(mut exp)
             }
-            EOF => {
+            EOF {
                 return true
             }
+            else {}
         }
 
         if is_sym_num(c) { 

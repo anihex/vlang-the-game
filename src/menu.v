@@ -1,5 +1,7 @@
 module main
 
+import sdl
+
 struct MenuItem {
 pub:
 mut:
@@ -56,6 +58,7 @@ fn (game mut Game) menu_set_current(menu &Menu) {
         last_menu := game.current_menu
         game.current_menu = menu
         game.current_menu.last_menu = last_menu
+        game.current_menu.active_item = 0
     }
 }
 
@@ -68,41 +71,42 @@ fn (game mut Game) menu_process_current() {
     game.menu_action = MENU_ACTION_NONE
 }
 
-fn (game mut Game) menu_sdl_event() {
-    _type := C.st_event_type()
-    match _type {
-        C.SDL_KEYDOWN => {
-            key := C.st_event_sym()
+fn (game mut Game) menu_sdl_event(ev sdl.Event) {
+    match int(ev._type) {
+        C.SDL_KEYDOWN {
+            key := int(ev.key.keysym.sym)
             match key {
-                C.SDLK_UP => {
+                C.SDLK_UP {
                     game.menu_action = MENU_ACTION_UP
                 }
-                C.SDLK_DOWN => {
+                C.SDLK_DOWN {
                     game.menu_action = MENU_ACTION_DOWN
                 }
-                C.SDLK_LEFT => {
+                C.SDLK_LEFT {
                     game.menu_action = MENU_ACTION_LEFT
                 }
-                C.SDLK_RIGHT => {
+                C.SDLK_RIGHT {
                     game.menu_action = MENU_ACTION_RIGHT
                 }
-                C.SDLK_RETURN => {
+                C.SDLK_RETURN {
                     game.menu_action = MENU_ACTION_HIT
                 }
+                else {}
             }
         }
-        C.SDL_MOUSEBUTTONDOWN => {
-            game.menu_sdl_event_mouse(true)
+        C.SDL_MOUSEBUTTONDOWN {
+            game.menu_sdl_event_mouse(&SdlMotionEvent(&ev))
         }
-        C.SDL_MOUSEMOTION => {
-            game.menu_sdl_event_mouse(false)
+        C.SDL_MOUSEMOTION {
+            game.menu_sdl_event_mouse(&SdlMotionEvent(&ev))
         }
+        else {}
     }
 }
 
-fn (game mut Game) menu_sdl_event_mouse(click bool) {
-    x := int(C.st_event_motion(0) / game.sdl.scale_x)
-    y := int(C.st_event_motion(1) / game.sdl.scale_y)
+fn (game mut Game) menu_sdl_event_mouse(ev &SdlMotionEvent) {
+    x := int(f32(ev.x) / game.sdl.scale_x)
+    y := int(f32(ev.y) / game.sdl.scale_y)
     mut current_menu := game.current_menu
 
     if (x > current_menu.pos_x - current_menu.width() / 2 &&
@@ -110,7 +114,7 @@ fn (game mut Game) menu_sdl_event_mouse(click bool) {
         y > current_menu.pos_y - current_menu.height() / 2 &&
         y < current_menu.pos_y + current_menu.height() / 2) {
         current_menu.active_item = (y - (current_menu.pos_y - current_menu.height() / 2)) / 36
-        if click {
+        if int(ev._type) == C.SDL_MOUSEBUTTONDOWN {
             game.menu_action = MENU_ACTION_HIT
         }
     }
@@ -123,7 +127,7 @@ fn (menu mut Menu) add_action(_text string) {
     }
 }
 
-fn (menu mut Menu) draw_item(index int, item MenuItem) {
+fn (menu &Menu) draw_item(index int, item MenuItem) {
     x_pos := menu.pos_x
     y_pos := menu.pos_y + 36 * index - menu.height() / 2 + 18
     mut font := menu.game.font_white
@@ -133,12 +137,13 @@ fn (menu mut Menu) draw_item(index int, item MenuItem) {
     }
 
     match item.item_type {
-        OPT_INACTIVE => {
+        OPT_INACTIVE {
             menu.game.font_black.draw_align(item.text, x_pos, y_pos, ALIGN_CENTER | ALIGN_MIDDLE, 255)
         }
-        OPT_ACTION => {
+        OPT_ACTION {
             font.draw_align(item.text, x_pos, y_pos, ALIGN_CENTER | ALIGN_MIDDLE, 255)
         }
+        else {}
     }
 }
 
@@ -167,26 +172,27 @@ fn (menu mut Menu) action() {
     }
 
     match menu.game.menu_action {
-        MENU_ACTION_UP => {
+        MENU_ACTION_UP {
             if menu.active_item > 0 {
                 menu.active_item -= 1
             } else {
                 menu.active_item = menu.items.len - 1
             }
         }
-        MENU_ACTION_DOWN => {
+        MENU_ACTION_DOWN {
             if menu.active_item < menu.items.len - 1 {
                 menu.active_item += 1
             } else {
                 menu.active_item = 0
             }
         }
-        MENU_ACTION_HIT => {
+        MENU_ACTION_HIT {
             mut item := &menu.items[menu.active_item]
             if item.item_type == OPT_ACTION {
                 item.toggled = true
             }
         }
+        else {}
     }
 }
 
@@ -203,7 +209,7 @@ fn (menu mut Menu) check() int {
     return -1
 }
 
-fn (menu mut Menu) draw() {
+fn (menu &Menu) draw() {
     menu_width := menu.width()
     menu_height := menu.height()
     alpha := 255
