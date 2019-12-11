@@ -15,7 +15,7 @@ fn (game &Game) load_texture(file string) &TextureType {
 
     filename := game.datadir + file
     println('loading image: ' + filename)
-    surface := &sdl.Surface(C.IMG_Load(filename.str))
+    surface := &SDL_Surface(C.IMG_Load(filename.str))
     ptexture.sdl_texture = C.SDL_CreateTextureFromSurface(game.sdl.renderer, surface)
 
     if ptexture.sdl_texture == 0 {
@@ -36,50 +36,26 @@ fn (tex &TextureType) free() {
 }
 
 fn (game &Game) texture_draw(ptexture &TextureType, _x, _y int) {
-    src := sdl.Rect {
-        x: 0, 
-        y: 0,
-        w: ptexture.w,
-        h: ptexture.h,
-    }
-
-    dest := sdl.Rect {
-        x: _x,
-        y: _y,
-        w: ptexture.w,
-        h: ptexture.h,
-    }
-
+    src  := SDL_Rect { x: 0, y: 0, w: ptexture.w, h: ptexture.h, }
+    dest := SDL_Rect { x: _x, y: _y, w: ptexture.w, h: ptexture.h, }
     C.SDL_RenderCopy(game.sdl.renderer, ptexture.sdl_texture, &src, &dest)
 }
 
 fn (game &Game) texture_draw_flip(ptexture &TextureType, _x, _y, flip int) {
-    src := sdl.Rect {
-        x: 0,
-        y: 0,
-        w: ptexture.w,
-        h: ptexture.h,
-    }
-
-    dest := sdl.Rect {
-        x: _x,
-        y: _y,
-        w: ptexture.w,
-        h: ptexture.h,
-    }
-
+    src  := SDL_Rect { x: 0, y: 0, w: ptexture.w, h: ptexture.h, }
+    dest := SDL_Rect { x: _x, y: _y, w: ptexture.w, h: ptexture.h, }
     C.SDL_RenderCopyEx(game.sdl.renderer, ptexture.sdl_texture, &src, &dest, 0, 0, flip)
 }
 
 fn (game &Game) texture_draw_rotated(ptexture &TextureType, _x, _y, angle int) {
-    src := sdl.Rect {
+    src := SDL_Rect {
         x: 0,
         y: 0,
         w: ptexture.w,
         h: ptexture.h,
     }
 
-    dest := sdl.Rect {
+    dest := SDL_Rect {
         x: _x,
         y: _y,
         w: ptexture.w,
@@ -90,14 +66,14 @@ fn (game &Game) texture_draw_rotated(ptexture &TextureType, _x, _y, angle int) {
 }
 
 fn (game &Game) texture_draw_part(ptexture &TextureType, _tx, _ty, _x, _y, _w, _h int, alpha byte) {
-    src := sdl.Rect {
+    src := SDL_Rect {
         x: _tx,
         y: _ty,
         w: _w,
         h: _h,
     }
 
-    dest := sdl.Rect {
+    dest := SDL_Rect {
         x: _x,
         y: _y,
         w: _w,
@@ -108,14 +84,14 @@ fn (game &Game) texture_draw_part(ptexture &TextureType, _tx, _ty, _x, _y, _w, _
 }
 
 fn (game &Game) texture_draw_bg(ptexture &TextureType) {
-    src := sdl.Rect {
+    src := SDL_Rect {
         x: 0,
         y: 0,
         w: ptexture.w,
         h: ptexture.h,
     }
 
-    dest := sdl.Rect {
+    dest := SDL_Rect {
         x: 0,
         y: 0,
         w: game.sdl.screen_width,
@@ -124,3 +100,7 @@ fn (game &Game) texture_draw_bg(ptexture &TextureType) {
 
     C.SDL_RenderCopy(game.sdl.renderer, ptexture.sdl_texture, &src, &dest)
 }
+
+const (
+  t_sdl_version = sdl.version
+)

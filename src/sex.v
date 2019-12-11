@@ -126,7 +126,7 @@ fn (parser mut SExpressionParser) next_char() byte {
     if parser.data.len == parser.pointer {
         return -1
     } else {
-        parser.pointer += 1
+        parser.pointer ++
         return parser.data.str[parser.pointer - 1]
     }
 }

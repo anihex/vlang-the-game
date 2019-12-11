@@ -181,7 +181,7 @@ fn (menu mut Menu) action() {
         }
         MENU_ACTION_DOWN {
             if menu.active_item < menu.items.len - 1 {
-                menu.active_item += 1
+                menu.active_item ++
             } else {
                 menu.active_item = 0
             }

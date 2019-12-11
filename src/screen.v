@@ -28,7 +28,7 @@ fn (game &Game) fillrect(x f32, y f32, w f32, h f32, r byte, g byte, b byte, a b
         _h = -_h
     }
 
-    rect := sdl.Rect{
+    rect := SDL_Rect{
         x: int(_x),
         y: int(_y),
         w: int(_w),
@@ -44,3 +44,7 @@ fn (game &Game) fillrect(x f32, y f32, w f32, h f32, r byte, g byte, b byte, a b
 fn (game &Game) flipscreen() {
     SDL_RenderPresent(game.sdl.renderer)
 }
+
+const (
+   sdl_version = sdl.version
+)
