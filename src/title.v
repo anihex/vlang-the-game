@@ -146,7 +146,7 @@ fn (game mut Game) title_level_select() bool {
                         }
                         C.SDLK_RETURN {
                             if current != game.level_subsets.len {
-                                subset := &LevelSubset(C.array_get(game.level_subsets, current))
+                                subset := &game.level_subsets[current]
                                 return game.prepare_game(subset)
                             }
                         }
@@ -170,7 +170,7 @@ fn (game mut Game) title_level_select() bool {
                 game.font_red.draw_align('Chapter ? - ???', game.sdl.screen_width / 2, game.sdl.screen_height / 2 - 200, ALIGN_CENTER | ALIGN_TOP, 255)
                 game.font_white.draw_align('Coming soon!', game.sdl.screen_width / 2, game.sdl.screen_height / 2, ALIGN_CENTER | ALIGN_MIDDLE, 255)
             } else {
-                subset := &LevelSubset(C.array_get(game.level_subsets, current))
+                subset := &game.level_subsets[ current ]
                 game.font_red.draw_align(subset.name, game.sdl.screen_width / 2, game.sdl.screen_height / 2 - 200, ALIGN_CENTER | ALIGN_TOP, 255)
                 game.font_white.draw_align(subset.description, game.sdl.screen_width / 2, game.sdl.screen_height / 2 + 100, ALIGN_CENTER | ALIGN_BOTTOM, 255)
                 

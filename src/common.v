@@ -67,17 +67,13 @@ fn C.vp_free(size voidptr)
 
 fn C.SDL_GetMouseState(x, y &int) u32
 fn C.SDL_SetRenderDrawBlendMode(renderer voidptr, flags int)
-fn C.SDL_SetRenderDrawColor(renderer voidptr, r, g, b byte)
 fn C.SDL_SetTextureBlendMode(tex voidptr, flags int)
 fn C.SDL_ShowCursor(flags int) int
-fn C.SDL_RenderFillRect(renderer voidptr, rect &sdl.Rect)
+fn C.SDL_RenderFillRect(renderer voidptr, rect &SDL_Rect)
 fn C.SDL_RenderCopyEx(renderer, tex , src, dest voidptr, x, y, flip int)
 
-fn C.Mix_HaltMusic()
 fn C.Mix_PlayingMusic() int
 
 fn C.IMG_Load(path charptr) voidptr
-
-fn C.array_get(arr voidptr, idx int) voidptr
 
 fn C.fabs(num f64) f64

@@ -1,5 +1,10 @@
 module main
 
+import sdl.mixer
+const (
+  mixer_version = mixer.version
+)
+
 #flag -I"@VPATH"
 #include <globals.h>
 
