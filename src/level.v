@@ -3,8 +3,7 @@ module main
 import os
 
 struct LevelSubset {
-pub:
-mut:
+pub mut:
     has_image bool
     name string
     description string
@@ -14,8 +13,7 @@ mut:
 }
 
 struct Level {
-pub:
-mut:
+pub mut:
     width int
     height int
     name string

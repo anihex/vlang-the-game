@@ -31,9 +31,9 @@ fn in_bounds(x, y, w, h, px, py int) bool {
 }
 
 fn (game mut Game) poll_quits() bool {
-    ev := sdl.Event{}
+    ev := SDL_Event{}
     for 0 < sdl.poll_event(&ev) {
-        match int(ev._type) {
+        match int(ev.@type) {
             C.SDL_QUIT {
                 game.quit = true
                 return false
@@ -76,4 +76,4 @@ fn C.Mix_PlayingMusic() int
 
 fn C.IMG_Load(path charptr) voidptr
 
-fn C.fabs(num f64) f64
+// fn C.fabs(num f64) f64 // NOTE: Redefined as of V 0.1.24 7bc5cfc

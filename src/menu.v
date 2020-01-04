@@ -3,16 +3,14 @@ module main
 import sdl
 
 struct MenuItem {
-pub:
-mut:
+pub mut:
     item_type int
     text string
     toggled bool
 }
 
 struct Menu {
-pub:
-mut:
+pub mut:
     game &Game
     pos_x int
     pos_y int 
@@ -71,8 +69,8 @@ fn (game mut Game) menu_process_current() {
     game.menu_action = MENU_ACTION_NONE
 }
 
-fn (game mut Game) menu_sdl_event(ev sdl.Event) {
-    match int(ev._type) {
+fn (game mut Game) menu_sdl_event(ev SDL_Event) {
+    match int(ev.@type) {
         C.SDL_KEYDOWN {
             key := int(ev.key.keysym.sym)
             match key {

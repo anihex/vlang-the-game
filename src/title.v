@@ -3,8 +3,7 @@ module main
 import sdl
 
 struct TitleState {
-pub:
-mut:
+pub mut:
     initialized bool
     had_intro bool
 
@@ -54,9 +53,9 @@ fn (game mut Game) title_load_failed(_error string) bool {
         }
 
 
-        ev := sdl.Event{}
+        ev := SDL_Event{}
         for 0 < sdl.poll_event(&ev) {
-            match u32(ev._type) {
+            match u32(ev.@type) {
                 u32(C.SDL_QUIT) {
                     game.quit = true
                     break
@@ -121,9 +120,9 @@ fn (game mut Game) title_level_select() bool {
     game.delta()
 
     for !(done || game.quit) {
-        ev := sdl.Event{}
+        ev := SDL_Event{}
         for 0 < sdl.poll_event(&ev) {
-            match u32(ev._type) {
+            match u32(ev.@type) {
                 u32(C.SDL_QUIT) {
                     game.quit = true
                     break
@@ -217,9 +216,9 @@ fn (game mut Game) title() bool {
     //game.flipscreen()
     game.menu_set_current(title.menu)
 
-    ev := sdl.Event{}
+    ev := SDL_Event{}
     for 0 < sdl.poll_event(&ev) {
-        if u32(ev._type) == u32(C.SDL_QUIT) {
+        if u32(ev.@type) == u32(C.SDL_QUIT) {
             game.quit = true
         }
     }
@@ -230,7 +229,7 @@ fn (game mut Game) title() bool {
         }
 
         for 0 < sdl.poll_event(&ev) {
-            if u32(ev._type) == u32(C.SDL_QUIT) {
+            if u32(ev.@type) == u32(C.SDL_QUIT) {
                 game.quit = true
             } else if title.had_intro {
                 game.menu_sdl_event(ev)

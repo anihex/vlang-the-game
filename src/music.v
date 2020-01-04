@@ -1,8 +1,7 @@
 module main
 
 struct MusicState {
-pub:
-mut:
+pub mut:
     current MusicType
     title_song voidptr
     level_song voidptr
