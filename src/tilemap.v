@@ -3,16 +3,14 @@ module main
 import os
 
 struct TileMap {
-pub:
-mut:
+pub mut:
     _game &Game
     textures &IntHashMap
     tiles &IntHashMap
 }
 
 struct Tile {
-pub:
-mut:
+pub mut:
     id u16
     x_pos u16
     y_pos u16

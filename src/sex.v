@@ -12,8 +12,7 @@ const (
 )
 
 struct SExpression {
-pub:
-mut:
+pub mut:
     _type int
     _name string
     _value int

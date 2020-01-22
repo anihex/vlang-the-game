@@ -1,8 +1,7 @@
 module main
 
 struct TimerType {
-pub:
-mut:
+pub mut:
     time u32
     period u32
     st_timer bool

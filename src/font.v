@@ -1,8 +1,7 @@
 module main
 
 struct Font {
-pub:
-mut:
+pub mut:
     game &Game
     texture &TextureType
     char_width int

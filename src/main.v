@@ -11,8 +11,7 @@ const (
 import os
 
 struct SdlContext {
-pub:
-mut:
+pub mut:
 	screen_width		int
 	screen_height		int
     scale_x         f32
@@ -23,8 +22,7 @@ mut:
 }
 
 struct Textures {
-pub:
-mut:
+pub mut:
     cursor &TextureType
     valex &TextureType
     valex_jump &TextureType
@@ -33,16 +31,14 @@ mut:
 }
 
 struct Sounds {
-pub:
-mut:
+pub mut:
     jump Sound
     big_jump Sound
     scream Sound
 }
 
 struct Game {
-pub:
-mut:
+pub mut:
     _delta f64
     last_tick u32
     menu_action int

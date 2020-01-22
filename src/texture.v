@@ -3,8 +3,7 @@ module main
 import sdl
 
 struct TextureType {
-pub:
-mut:
+pub mut:
     sdl_texture voidptr
     w int
     h int

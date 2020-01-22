@@ -508,12 +508,12 @@ fn (game mut Game) game_loop() bool {
             break
         }
 
-        ev := sdl.Event{}
+        ev := SDL_Event{}
         for 0 < sdl.poll_event(&ev) {
-            if int(ev._type) == C.SDL_QUIT {
+            if int(ev.@type) == C.SDL_QUIT {
                 game.quit = true
                 break
-            } else if int(ev._type) == C.SDL_KEYDOWN {
+            } else if int(ev.@type) == C.SDL_KEYDOWN {
                 key := int(ev.key.keysym.sym)
                 game.handle_game_sdl_event(key, true)
                 
@@ -522,7 +522,7 @@ fn (game mut Game) game_loop() bool {
                 }
 
                 game.menu_sdl_event(ev)
-            } else if int(ev._type) == C.SDL_KEYUP {
+            } else if int(ev.@type) == C.SDL_KEYUP {
                 key := int(ev.key.keysym.sym)
                 game.handle_game_sdl_event(key, false)
                 game.menu_sdl_event(ev)
