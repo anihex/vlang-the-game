@@ -172,7 +172,7 @@ fn (menu mut Menu) action() {
     match menu.game.menu_action {
         MENU_ACTION_UP {
             if menu.active_item > 0 {
-                menu.active_item -= 1
+                menu.active_item -- 1
             } else {
                 menu.active_item = menu.items.len - 1
             }

@@ -151,7 +151,7 @@ fn is_sym_num(c byte) bool {
 }
 
 fn (parser mut SExpressionParser) read_number_or_symbol(exp mut SExpression) bool {
-    parser.pointer -= 1
+    parser.pointer -- 1
     start := parser.pointer
     mut sign := false
     mut is_number := true
@@ -169,7 +169,7 @@ fn (parser mut SExpressionParser) read_number_or_symbol(exp mut SExpression) boo
             } else {
                 if is_end(c) {
                     exp._type = S_TYPE_INTEGER
-                    parser.pointer -= 1
+                    parser.pointer -- 1
                     if sign {
                         exp._value *= -1
                     }
@@ -185,7 +185,7 @@ fn (parser mut SExpressionParser) read_number_or_symbol(exp mut SExpression) boo
             if is_end(c) {
                 exp._type = S_TYPE_SYMBOL
                 exp._name = from_bytes(bytes)
-                parser.pointer -= 1
+                parser.pointer -- 1
                 return true
             } else if is_sym_num(c) {
                 bytes << c
