@@ -2,7 +2,7 @@
 
 A little platformer written in V, made purely for memes and fun.
 
-![screenshot](https://cdn.discordapp.com/attachments/489123163330838529/635864875507253268/unknown.png)
+![Title (Scrennshot)](screenshots/title.png)
 
 ### Credits
 
