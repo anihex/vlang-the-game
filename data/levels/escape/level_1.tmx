@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-down" width="250" height="15" tilewidth="32" tileheight="32" nextobjectid="1">
+ <properties>
+  <property name="music" value="_escape_.mod"/>
+  <property name="name" value="Where the fuck am I"/>
+  <property name="player_x" type="int" value="100"/>
+  <property name="player_y" type="int" value="100"/>
+  <property name="version" type="int" value="1"/>
+ </properties>
+ <tileset firstgid="1" name="escape" tilewidth="32" tileheight="32" tilecount="64" columns="8">
+  <image source="../../images/tiles/tiles.png" width="256" height="256"/>
+ </tileset>
+ <layer name="background-tm" width="250" height="15">
+  <data encoding="base64" compression="zlib">
+   eJztkkEKxDAMA0P//+g99BYW2kpxZAUNzDGycXSNMa7JHeye58D8DzH+E2FVDjM33Kj7Ez1EWJXDzA036v5EDxFW5TBz3+xUeYMuqPsTPURYlcPMfbNT5Q26oO5P9BBhVc5TZucbdEHdn+ghQkW+2w26oO5P9BChIt/tBl1Q9yd6iFCRz+69+wZdUPcneohQkc/uvfsGXVD3J3qIgL57ymT23n2DLqj7Ez1EQN99nTHPYfc+EXV/oocI6LuvM+Y57N4nou5P9BABfcfC7n0i6v5EDxHQdyzs3iei7k/0EOEHffoSoQ==
+  </data>
+ </layer>
+ <layer name="foreground-tm" width="250" height="15">
+  <data encoding="base64" compression="zlib">
+   eJztwYEAAAAAw6D5Ux/hAlUBAAAAAAAAAAAAAAAAAMA3OpgAAQ==
+  </data>
+ </layer>
+ <layer name="interactive-tm" width="250" height="15">
+  <data encoding="base64" compression="zlib">
+   eJztmYsOwjAIRTVqtv//YjXZkrlAeRQ6sNyEmMVJC+W0G95vv3p87AXY88YX5gPzRd3PNckcI8oqD1ls5HppcxutprRx3Jl+ivM8Grlf/GPOj/mLFl9xHm9NrpIH5zPlNgPnUkXjXDLOee6lkoUsOPfaK4rz/ILyFu08obRsn+tmS+PeqKLq8RwTFGPLxwPxS3139CtVBM61ysj5Krw/Y4wWourdcyzv87yHc60y11HmuXM1Q4xfQay1rr3H9n5uh+LxjDFDHUHPKpw1uGLftFZrfVrPTVhtWT1X7b6kPrD6l3JuuX7F+Rh59CyoOtTWKWfMEe/VmnejEZwvm62Ha2wOlpz3MCL5LdZv4MaJjet97mg5t6xpaz64Oc7a6+L8bzbbed7DvQdjFpzvfczdrOZj1TtrraVlv50am8t5JtZ71mtmzkf1hqHxOP1zyZ7EWf+zRePc2ricU7/rYUS791jH3eMfy0dxDqs4z8n5CGXk3GqOV3PuaVQtSd6do3I+qmak8y7O+/wV5/01uKs498txcX69QRwer2fhXCJtHG9MlRe4
+  </data>
+ </layer>
+</map>

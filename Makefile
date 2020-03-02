@@ -32,7 +32,7 @@ run-linux: $(BIN)
 	@./$(BIN)
 
 $(BIN): $(SRC)
-	$(V) -cb -o $(BIN) -os linux ./vgame
+	$(V) -keep_c -o $(BIN) -os linux ./vgame
 
 $(BIN).exe: $(SRC)
 	$(V) -prod -o $(BIN).exe -os windows ./vgame
